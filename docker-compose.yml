@@ -1,0 +1,140 @@
+version: "3.2"
+
+services:
+
+  pdns_db:
+    image: postgres:13
+    container_name: pdns_db
+    restart: always
+    networks:
+      - pdns_db_net
+    environment:
+      POSTGRES_DB: pdns
+      POSTGRES_USER: pdns
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_passwd
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    secrets:
+      - db_passwd
+    user: postgres:postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pdns" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+
+  pdns_server:
+    build: .
+    image: powerdns:server
+    container_name: pdns_server
+    restart: always
+    ports:
+      - "8081:8081"
+      - "8053:53/udp"
+      - "8053:53/tcp"
+    networks:
+      - pdns_db_net
+      - pdns_web_net
+    depends_on:
+      pdns_db:
+        condition: service_healthy
+
+  pdns_admin_db:
+    image: postgres:13
+    container_name: pdns_admin_db
+    restart: always
+    networks:
+      - pdns_admin_db_net
+    environment:
+      POSTGRES_DB: pdns_admin
+      POSTGRES_USER: pdns_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/admin_db_password
+    volumes:
+      - db_admin:/var/lib/postgresql/data
+    secrets:
+      - admin_db_password
+    user: postgres:postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pdns_admin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+
+  pdns_admin:
+    image: ngoduykhanh/powerdns-admin:latest
+    container_name: pdns_admin
+    restart: always
+    ports:
+      - "9191:80"
+    networks:
+      - pdns_admin_db_net
+      - pdns_web_net
+    environment:
+      - SECRET_KEY_FILE=/run/secrets/pdns_admin_secret_key
+      - SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri
+      - GUNICORN_TIMEOUT=60
+      - GUNICORN_WORKERS=2
+      - GUNICORN_LOGLEVEL=DEBUG
+      - OFFLINE_MODE=False # True for offline, False for external resources
+    secrets:
+      - pdns_admin_secret_key
+      - db_uri
+    depends_on:
+      pdns_admin_db:
+        condition: service_healthy
+
+volumes:
+  db:
+  db_admin:
+
+secrets:
+
+  db_passwd:
+    file: ./secrets/db_password.txt
+
+  pdns_admin_secret_key:
+    file: ./secrets/pdns_admin_secret_key.txt
+
+  admin_db_password:
+    file: ./secrets/admin_db_password.txt
+
+  db_uri:
+    file: ./secrets/db_uri.txt
+
+networks:
+
+  pdns_db_net:
+    name: pdns_db_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.88/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-pdns_db
+
+  pdns_admin_db_net:
+    name: pdns_admin_db_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.96/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-pdns_admin
+
+  pdns_web_net:
+    name: pdns_web_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.104/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-pdns_web
