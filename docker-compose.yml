@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/db_passwd
     volumes:
       - db:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./authoritative/init.sql:/docker-entrypoint-initdb.d/init.sql
     secrets:
       - db_passwd
     user: postgres:postgres
@@ -28,18 +28,18 @@ services:
     security_opt:
       - no-new-privileges
 
-  pdns_server:
-    build: .
-    image: powerdns:server
-    container_name: pdns_server
+  pdns_authoritative:
+    build: authoritative
+    image: powerdns:authoritative
+    container_name: pdns_authoritative
     restart: always
     ports:
       - "8081:8081"
-      - "8053:53/udp"
-      - "8053:53/tcp"
     networks:
-      - pdns_db_net
-      - pdns_web_net
+      pdns_db_net:
+      pdns_web_net:
+      pdns_recursor_net:
+        ipv4_address: "172.26.0.114"
     depends_on:
       pdns_db:
         condition: service_healthy
@@ -92,6 +92,19 @@ services:
       pdns_admin_db:
         condition: service_healthy
 
+  pdns_recursor:
+    build: recursor
+    image: powerdns:recursor
+    container_name: pdns_recursor
+    restart: always
+    ports:
+      - "8053:53/udp"
+      - "8053:53/tcp"
+    networks:
+      - pdns_recursor_net
+    depends_on:
+      - pdns_authoritative
+
 volumes:
   db:
   db_admin:
@@ -138,3 +151,12 @@ networks:
         - subnet: "172.26.0.104/29"
     driver_opts:
       com.docker.network.bridge.name: dbr-pdns_web
+
+  pdns_recursor_net:
+    name: pdns_recursor_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.112/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-pdns_rec
