@@ -33,12 +33,10 @@ services:
     image: powerdns:authoritative
     container_name: pdns_authoritative
     restart: always
-    ports:
-      - "8081:8081"
     networks:
       pdns_db_net:
       pdns_web_net:
-      pdns_recursor_net:
+      pdns_link_net:
         ipv4_address: "172.26.0.114"
     depends_on:
       pdns_db:
@@ -74,7 +72,7 @@ services:
     container_name: pdns_admin
     restart: always
     ports:
-      - "9191:80"
+      - "8080:80"
     networks:
       - pdns_admin_db_net
       - pdns_web_net
@@ -100,17 +98,39 @@ services:
     image: powerdns:recursor
     container_name: pdns_recursor
     restart: always
-    ports:
-      - "8053:53/udp"
-      - "8053:53/tcp"
     networks:
-      - pdns_recursor_net
+      pdns_link_net:
+      hole_net:
+        ipv4_address: "172.26.0.122"
     depends_on:
       - pdns_authoritative
+
+  pihole:
+    image: pihole/pihole
+    container_name: pihole
+    hostname: pihole
+    restart: always
+    ports:
+      - "8081:80"
+      - "53:53/tcp"
+      - "53:53/udp"
+    networks:
+      - hole_net
+    environment:
+      - TZ=Europe/Amsterdam
+      - PIHOLE_DNS_=172.26.0.122
+      - DNSMASQ_LISTENING=all
+    volumes:
+      - pihole:/etc/pihole/
+      - dnsmasq:/etc/dnsmasq.d/
+    depends_on:
+      - pdns_recursor
 
 volumes:
   db:
   db_admin:
+  pihole:
+  dnsmasq:
 
 secrets:
 
@@ -155,11 +175,20 @@ networks:
     driver_opts:
       com.docker.network.bridge.name: dbr-pdns_web
 
-  pdns_recursor_net:
-    name: pdns_recursor_net
+  pdns_link_net:
+    name: pdns_link_net
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.112/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_rec
+      com.docker.network.bridge.name: dbr-pdns_link
+
+  hole_net:
+    name: hole_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.120/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-hole
