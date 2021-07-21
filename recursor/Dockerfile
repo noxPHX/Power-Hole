@@ -16,4 +16,8 @@ RUN apt-get update && \
 COPY recursor.conf /etc/powerdns/recursor.d/recursor.conf
 COPY zones /etc/powerdns/zones
 
+ARG UPSTREAM
+
+RUN sed -i "s/UPSTREAM/${UPSTREAM}/g" /etc/powerdns/recursor.d/recursor.conf
+
 ENTRYPOINT [ "pdns_recursor" ]

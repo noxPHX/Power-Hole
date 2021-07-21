@@ -93,7 +93,10 @@ services:
         condition: service_healthy
 
   pdns_recursor:
-    build: recursor
+    build:
+      context: recursor
+      args:
+        UPSTREAM: "9.9.9.9"
     image: powerdns:recursor
     container_name: pdns_recursor
     restart: always
