@@ -21,7 +21,11 @@ COPY zones /etc/powerdns/zones
 
 ARG UPSTREAM
 
-RUN sed -i "s/UPSTREAM/${UPSTREAM}/g" /etc/powerdns/recursor.d/recursor.conf
+RUN sed -i "s/UPSTREAM/${UPSTREAM}/g" /etc/powerdns/recursor.d/recursor.conf && \
+    mkdir /var/run/pdns && \
+    chown -R pdns:pdns /var/run/pdns /etc/powerdns/
+
+USER pdns
 
 ENTRYPOINT [ "pdns_recursor" ]
 
