@@ -1,7 +1,10 @@
 FROM debian:buster-slim
 
 RUN apt-get update && \
-    apt-get -y install curl gnupg
+    apt-get -y install \
+    curl \
+    gnupg \
+    dnsutils
 
 RUN echo "deb [arch=amd64] http://repo.powerdns.com/debian buster-auth-master main" > /etc/apt/sources.list.d/pdns.list && \
     curl https://repo.powerdns.com/CBC8B383-pub.asc | apt-key add - && \
@@ -21,3 +24,5 @@ ARG UPSTREAM
 RUN sed -i "s/UPSTREAM/${UPSTREAM}/g" /etc/powerdns/recursor.d/recursor.conf
 
 ENTRYPOINT [ "pdns_recursor" ]
+
+HEALTHCHECK CMD dig +short +norecurse +retry=0 @127.0.0.1 || exit 1

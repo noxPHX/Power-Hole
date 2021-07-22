@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3.9"
 
 services:
 
@@ -89,6 +89,8 @@ services:
     depends_on:
       pdns_admin_db:
         condition: service_healthy
+      pdns_authoritative:
+        condition: service_healthy
 
   pdns_recursor:
     build:
@@ -103,7 +105,8 @@ services:
       hole_net:
         ipv4_address: "172.26.0.122"
     depends_on:
-      - pdns_authoritative
+      pdns_authoritative:
+        condition: service_healthy
 
   pihole:
     image: pihole/pihole
@@ -124,7 +127,8 @@ services:
       - pihole:/etc/pihole/
       - dnsmasq:/etc/dnsmasq.d/
     depends_on:
-      - pdns_recursor
+      pdns_recursor:
+        condition: service_healthy
 
 volumes:
   db:
