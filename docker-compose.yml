@@ -154,6 +154,7 @@ networks:
 
   pdns_db_net:
     name: pdns_db_net
+    internal: true
     ipam:
       driver: default
       config:
@@ -163,6 +164,7 @@ networks:
 
   pdns_admin_db_net:
     name: pdns_admin_db_net
+    internal: true
     ipam:
       driver: default
       config:
@@ -181,6 +183,7 @@ networks:
 
   pdns_link_net:
     name: pdns_link_net
+    internal: true
     ipam:
       driver: default
       config:
