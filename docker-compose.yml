@@ -41,6 +41,10 @@ services:
     depends_on:
       pdns_db:
         condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
 
   pdns_admin_db:
     image: postgres:13
@@ -82,7 +86,7 @@ services:
       - GUNICORN_TIMEOUT=60
       - GUNICORN_WORKERS=2
       - GUNICORN_LOGLEVEL=DEBUG
-      - OFFLINE_MODE=False # True for offline, False for external resources
+      - OFFLINE_MODE=False
     secrets:
       - pdns_admin_secret_key
       - db_uri
@@ -91,6 +95,12 @@ services:
         condition: service_healthy
       pdns_authoritative:
         condition: service_healthy
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges
 
   pdns_recursor:
     build:
@@ -107,6 +117,10 @@ services:
     depends_on:
       pdns_authoritative:
         condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
 
   pihole:
     image: pihole/pihole
@@ -129,6 +143,17 @@ services:
     depends_on:
       pdns_recursor:
         condition: service_healthy
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+      - SETFCAP
+    security_opt:
+      - no-new-privileges
 
 volumes:
   db:
