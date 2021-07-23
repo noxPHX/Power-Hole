@@ -2,4 +2,5 @@
 .idea/
 
 # Secrets
-secrets/
+secrets/*
+!secrets/.gitkeep
