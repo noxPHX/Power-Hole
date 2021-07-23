@@ -5,6 +5,7 @@ services:
   pdns_db:
     image: postgres:13
     container_name: pdns_db
+    hostname: pdns_db
     restart: always
     networks:
       - pdns_db_net
@@ -32,6 +33,7 @@ services:
     build: authoritative
     image: powerdns:authoritative
     container_name: pdns_authoritative
+    hostname: pdns_authoritative
     restart: always
     networks:
       pdns_db_net:
@@ -49,6 +51,7 @@ services:
   pdns_admin_db:
     image: postgres:13
     container_name: pdns_admin_db
+    hostname: pdns_admin_db
     restart: always
     networks:
       - pdns_admin_db_net
@@ -74,6 +77,7 @@ services:
   pdns_admin:
     image: ngoduykhanh/powerdns-admin:latest
     container_name: pdns_admin
+    hostname: pdns_admin
     restart: always
     ports:
       - "8080:80"
@@ -109,6 +113,7 @@ services:
         UPSTREAM: "9.9.9.9"
     image: powerdns:recursor
     container_name: pdns_recursor
+    hostname: pdns_recursor
     restart: always
     networks:
       pdns_link_net:
