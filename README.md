@@ -24,7 +24,7 @@ Only [Docker](https://docs.docker.com/get-docker/) and [Compose](https://docs.do
 
 | Tool          | Version |
 |:-------------:|:-------:|
-| Docker        | 19      |
+| Docker        | 20      |
 | Compose       | 1.29    |
 
 ## The Stack 🐳
@@ -54,10 +54,10 @@ To properly work, Power-Hole needs to have some secrets defined:
 Here is some inspiration to help you randomly create these secrets, feel free to set them as you please.
 ```bash
 cd secrets
-openssl rand -base64 32 > db_password.txt
-date +%s | sha256sum | base64 | head -c 32 > admin_db_password.txt
+date +%s | sha256sum | base64 | head -c 32 > db_password.txt
+openssl rand -base64 32 > admin_db_password.txt
 echo "postgresql://pdns_admin:$(cat admin_db_password.txt)@pdns_admin_db/pdns_admin" > db_uri.txt
-dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 > api_key.txt
+dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
 
