@@ -17,7 +17,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY recursor.conf /etc/powerdns/recursor.d/recursor.conf
-COPY zones /etc/powerdns/zones
 
 ARG UPSTREAM
 
