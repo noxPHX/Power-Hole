@@ -62,13 +62,24 @@ cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
 
 ### Configuration
-TODO  
+The only thing you might want to change is the upstream resolver for the recursive server, you can change it in the `docker-compose.yml` file under the `pdns_recursor` service as a build argument *(l. 113)*.  
+Here are some resolvers you can use (Quad9 is the **default** one).  
 
-⚠️ **You must ensure that no other service is running on port 53 (eg systemd-resolved) otherwise you can change the port to bind.** ⚠️
+| Name            | Address        |
+|:---------------:|:--------------:|
+| **Quad9**       | **9.9.9.9**    |
+| Cloudflare      | 1.1.1.1        |
+| Google          | 8.8.8.8        |
+| Cisco's OpenDNS | 208.67.222.222 |
+
+You can also change the different Postgres' users and database names but make sure to change these parameters accordingly in the others configuration and secret files.
 
 ### Run!
 
-When you are ready, these commands will suffice to build the images and run the services.
+When you are ready, these commands will suffice to build the images and run the services.  
+
+⚠️ **You must ensure that no other service is running on port 53 (eg systemd-resolved) otherwise you can change the port to bind.** ⚠️
+
 ```bash
 ./build.sh
 docker-compose up -d
