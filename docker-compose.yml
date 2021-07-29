@@ -38,8 +38,8 @@ services:
     networks:
       pdns_db_net:
       pdns_web_net:
-      pdns_link_net:
-        ipv4_address: "172.26.0.114"
+      pdns_auth_net:
+        ipv4_address: "172.26.0.122"
     depends_on:
       pdns_db:
         condition: service_healthy
@@ -107,20 +107,37 @@ services:
       - no-new-privileges
 
   pdns_recursor:
-    build:
-      context: recursor
-      args:
-        UPSTREAM: "9.9.9.9"
+    build: recursor
     image: powerdns:recursor
     container_name: pdns_recursor
     hostname: pdns_recursor
     restart: always
     networks:
-      pdns_link_net:
-      hole_net:
-        ipv4_address: "172.26.0.122"
+      pdns_rec_net:
+        ipv4_address: "172.26.0.114"
     depends_on:
       pdns_authoritative:
+        condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+
+  pdns_forwarder:
+    build: forwarder
+    image: powerdns:forwarder
+    container_name: pdns_forwarder
+    hostname: pdns_forwarder
+    restart: always
+    networks:
+      pdns_auth_net:
+      pdns_rec_net:
+      hole_net:
+        ipv4_address: "172.26.0.130"
+    depends_on:
+      pdns_authoritative:
+        condition: service_healthy
+      pdns_recursor:
         condition: service_healthy
     cap_drop:
       - ALL
@@ -140,13 +157,13 @@ services:
       - hole_net
     environment:
       - TZ=Europe/Amsterdam
-      - PIHOLE_DNS_=172.26.0.122
+      - PIHOLE_DNS_=172.26.0.130
       - DNSMASQ_LISTENING=all
     volumes:
       - pihole:/etc/pihole/
       - dnsmasq:/etc/dnsmasq.d/
     depends_on:
-      pdns_recursor:
+      pdns_forwarder:
         condition: service_healthy
     cap_drop:
       - ALL
@@ -211,21 +228,30 @@ networks:
     driver_opts:
       com.docker.network.bridge.name: dbr-pdns_web
 
-  pdns_link_net:
-    name: pdns_link_net
-    internal: true
+  pdns_rec_net:
+    name: pdns_rec_net
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.112/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_link
+      com.docker.network.bridge.name: dbr-pdns_rec
+
+  pdns_auth_net:
+    name: pdns_auth_net
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.120/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-pdns_auth
 
   hole_net:
     name: hole_net
     ipam:
       driver: default
       config:
-        - subnet: "172.26.0.120/29"
+        - subnet: "172.26.0.128/29"
     driver_opts:
       com.docker.network.bridge.name: dbr-hole

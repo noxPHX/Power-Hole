@@ -1,14 +1,19 @@
 # Power-Hole
 
-Power-Hole is a simple Docker Compose stack featuring [PowerDNS](https://github.com/PowerDNS/pdns), [PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) and [Pi-hole](https://github.com/pi-hole/pi-hole) for a quick & easy secure DNS service setup.
+Power-Hole is a simple Docker Compose stack featuring [PowerDNS](https://github.com/PowerDNS/pdns), [PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) and [Pi-hole](https://github.com/pi-hole/pi-hole) for a quick & easy DNS setup.  
+
+*This project is intended to meet my personal requirements and thus fulfill a very specific need (see more below).*  
 
 ## Introduction 🖋️
-[PowerDNS](https://github.com/PowerDNS/pdns) is a suite of software which provide an authoritative and a recursive DNS server as well as a load balancer.  
-[PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) is a web interface to make simple the management of PowerDNS.  
+[PowerDNS](https://github.com/PowerDNS/pdns) is a suite of various pieces of software which provide an authoritative and a recursive DNS server as well as a load balancer.  
+[PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) is a web interface to make simple the management of PowerDNS thanks to the REST API the latter provides.  
 Finally [Pi-hole](https://github.com/pi-hole/pi-hole) is a [DNS sinkhole](https://en.wikipedia.org/wiki/DNS_sinkhole) which primary goal is to provide network-wide ad blocking.  
 
-The aim of this project is to supply an easy way to deploy and manage a DNS server while protecting the devices from unwanted content.  
-With PowerDNS you will create and manage your own DNS zones while blocking ads or undesired servers with Pi-hole.
+The aim of this project is to supply an easy way to deploy and manage a stack of DNS services featuring:
++ 👮 Your own DNS zones, with the authoritative server
++ 🚀 Fast speeds, with local DNS caching
++ 🔒 Secure network, blocking unwanted content
++ 🚫 Privacy, with your own recursive server
 
 ## Table of contents 📋
 See below the top level parts of this README:
@@ -27,13 +32,19 @@ Only [Docker](https://docs.docker.com/get-docker/) and [Compose](https://docs.do
 | Docker        | 20      |
 | Compose       | 1.29    |
 
+*I will not detail how to set up this project without Docker, but understanding the stack below you might be able to install and configure each component separately.*
+
 ## The Stack 🐳
 
-The `docker-compose.yml` file defines 6 services:
+The `docker-compose.yml` file defines **7** services:
 + **pdns_authoritative**, the authoritative DNS server and its database **pdns_db**
-+ **pdns_recursor**, the recursive server
 + **pdns_admin**, the web interface and its database **pdns_admin_db**
++ **pdns_recursor**, the recursive server
++ **pdns_forwarder**, to forward the requests
 + **pihole**, the DNS sinkhole
+
+In a nutshell, to resolve a domain, **Pi-hole** receive the DNS request and decide whether to block it or not, if the domain is authorized the request is passed to the **forwarder**.  
+The **forwarder** will then pass the request to the **authoritative server**, if the latter does not manage the domain, the request is sent to the **recursive server** to be resolved.
 
 ## Getting Started 🛠️
 Fetch the code from the repository and enter the folder.
@@ -61,19 +72,6 @@ dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
 
-### Configuration
-The only thing you might want to change is the upstream resolver for the recursive server, you can change it in the `docker-compose.yml` file under the `pdns_recursor` service as a build argument *(l. 113)*.  
-Here are some resolvers you can use (Quad9 is the **default** one).  
-
-| Name            | Address        |
-|:---------------:|:--------------:|
-| **Quad9**       | **9.9.9.9**    |
-| Cloudflare      | 1.1.1.1        |
-| Google          | 8.8.8.8        |
-| Cisco's OpenDNS | 208.67.222.222 |
-
-You can also change the different Postgres' users and database names but make sure to change these parameters accordingly in the others configuration and secret files.
-
 ### Run!
 
 When you are ready, these commands will suffice to build the images and run the services.  
@@ -85,6 +83,9 @@ When you are ready, these commands will suffice to build the images and run the 
 docker-compose up -d
 ```
 *The `docker-compose build` command can not be used here because I need to use Docker's build time secrets which are currently not supported by Compose, hence a convenient script replace this command here.*
+
+Finally, change the DNS server of your devices to the host on which you deployed the stack.  
+Depending on your ISP, you might even be able to change it on your router's settings directly.  
 
 ## Contributing 🤝
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

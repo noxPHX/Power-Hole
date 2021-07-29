@@ -16,13 +16,10 @@ RUN apt-get update && \
     apt-get -y --no-install-recommends install pdns-recursor && \
     rm -rf /var/lib/apt/lists/*
 
-COPY recursor.conf /etc/powerdns/recursor.d/recursor.conf
+COPY --chown=pdns:pdns recursor.conf /etc/powerdns/recursor.d/recursor.conf
 
-ARG UPSTREAM
-
-RUN sed -i "s/UPSTREAM/${UPSTREAM}/g" /etc/powerdns/recursor.d/recursor.conf && \
-    mkdir /var/run/pdns && \
-    chown -R pdns:pdns /var/run/pdns /etc/powerdns/
+RUN mkdir /var/run/pdns && \
+    chown -R pdns:pdns /var/run/pdns
 
 USER pdns
 
