@@ -79,11 +79,10 @@ services:
     container_name: pdns_admin
     hostname: pdns_admin
     restart: always
-    ports:
-      - "8080:80"
     networks:
       - pdns_admin_db_net
       - pdns_web_net
+      - nginx_admin_net
     environment:
       - SECRET_KEY_FILE=/run/secrets/pdns_admin_secret_key
       - SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri
@@ -150,11 +149,11 @@ services:
     hostname: pihole
     restart: always
     ports:
-      - "8081:80"
       - "53:53/tcp"
       - "53:53/udp"
     networks:
       - hole_net
+      - nginx_pihole_net
     environment:
       - TZ=Europe/Amsterdam
       - PIHOLE_DNS_=172.26.0.130
@@ -177,6 +176,38 @@ services:
     security_opt:
       - no-new-privileges
 
+  nginx:
+    build:
+      context: nginx
+      args:
+        ADMIN_HOSTNAME: pdns.local.intra
+        PIHOLE_HOSTNAME: pihole.local.intra
+    image: powerhole:nginx
+    container_name: powerhole_nginx
+    restart: always
+    ports:
+      - "80:8080"
+      - "443:44380"
+    networks:
+      - nginx_admin_net
+      - nginx_pihole_net
+    secrets:
+      - source: certificate
+        target: /srv/certificates/fullchain.pem
+      - source: private_key
+        target: /srv/certificates/privkey.pem
+      - source: dh_params
+        target: /srv/certificates/dhparams.pem
+    depends_on:
+      pdns_admin:
+        condition: service_healthy
+      pihole:
+        condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+
 volumes:
   db:
   db_admin:
@@ -196,6 +227,15 @@ secrets:
 
   db_uri:
     file: ./secrets/db_uri.txt
+
+  certificate:
+    file: ./secrets/ssl/fullchain.pem
+
+  private_key:
+    file: ./secrets/ssl/privkey.pem
+
+  dh_params:
+    file: ./secrets/ssl/dhparams.pem
 
 networks:
 
@@ -221,6 +261,7 @@ networks:
 
   pdns_web_net:
     name: pdns_web_net
+    internal: true
     ipam:
       driver: default
       config:
@@ -255,3 +296,21 @@ networks:
         - subnet: "172.26.0.128/29"
     driver_opts:
       com.docker.network.bridge.name: dbr-hole
+
+  nginx_admin_net:
+    name: nginx_admin_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.136/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-ng_admin
+
+  nginx_pihole_net:
+    name: nginx_pihole_net
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.26.0.144/29"
+    driver_opts:
+      com.docker.network.bridge.name: dbr-ng_pihole

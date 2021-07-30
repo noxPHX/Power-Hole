@@ -21,4 +21,4 @@ cd "$this_script_path" || exit 1
 export DOCKER_BUILDKIT=1
 docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api_key,src=secrets/api_key.txt -t powerdns:authoritative authoritative
 
-docker-compose build pdns_recursor pdns_forwarder
+docker-compose build pdns_recursor pdns_forwarder nginx

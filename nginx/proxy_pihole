@@ -1,0 +1,34 @@
+server {
+    listen 8080;
+
+    server_name pihole.local.intra;
+
+    return https://$host$request_uri;
+}
+
+server {
+    listen 44380 ssl http2;
+
+    server_name pihole.local.intra;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains;";
+    add_header Referrer-Policy "no-referrer" always;
+    add_header X-Download-Options "noopen" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
+    add_header X-Robots-Tag "none" always;
+
+    location / {
+        return https://$host/admin/;
+    }
+
+    location /admin/ {
+        resolver                127.0.0.11 valid=10s;
+        set $upstreamName       pihole:80;
+        proxy_pass              http://$upstreamName;
+        proxy_redirect          off;
+        proxy_set_header        Host                $host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-Proto   $scheme;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+    }
+}

@@ -4,3 +4,6 @@
 # Secrets
 secrets/*
 !secrets/.gitkeep
+!secrets/ssl
+secrets/ssl/*
+!secrets/ssl/.gitkeep
