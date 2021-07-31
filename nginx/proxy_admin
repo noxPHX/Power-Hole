@@ -11,12 +11,6 @@ server {
 
     server_name pdns.local.intra;
 
-    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains;";
-    add_header Referrer-Policy "no-referrer" always;
-    add_header X-Download-Options "noopen" always;
-    add_header X-Permitted-Cross-Domain-Policies "none" always;
-    add_header X-Robots-Tag "none" always;
-
     location / {
         resolver                127.0.0.11 valid=10s;
         set $upstreamName       pdns_admin:80;
