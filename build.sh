@@ -19,6 +19,6 @@ cd "$this_script_path" || exit 1
 
 # Compose does not allow yet BuildKit secrets
 export DOCKER_BUILDKIT=1
-docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api_key,src=secrets/api_key.txt -t powerdns:authoritative authoritative
+docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api_key,src=secrets/api_key.txt -t powerhole:authoritative authoritative
 
-docker-compose build pdns_recursor pdns_forwarder nginx
+docker-compose build powerhole_pdns_recursor powerhole_pdns_forwarder powerhole_nginx

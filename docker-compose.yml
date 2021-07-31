@@ -2,19 +2,19 @@ version: "3.9"
 
 services:
 
-  pdns_db:
+  powerhole_pdns_auth_db:
     image: postgres:13
-    container_name: pdns_db
-    hostname: pdns_db
+    container_name: powerhole_pdns_auth_db
+    hostname: powerhole_pdns_auth_db
     restart: always
     networks:
-      - pdns_db_net
+      - powerhole_pdns_auth_db
     environment:
-      POSTGRES_DB: pdns
-      POSTGRES_USER: pdns
+      POSTGRES_DB: powerhole
+      POSTGRES_USER: powerhole
       POSTGRES_PASSWORD_FILE: /run/secrets/db_passwd
     volumes:
-      - db:/var/lib/postgresql/data
+      - db_auth:/var/lib/postgresql/data
       - ./authoritative/init.sql:/docker-entrypoint-initdb.d/init.sql
     secrets:
       - db_passwd
@@ -29,35 +29,35 @@ services:
     security_opt:
       - no-new-privileges
 
-  pdns_authoritative:
+  powerhole_pdns_authoritative:
     build: authoritative
-    image: powerdns:authoritative
-    container_name: pdns_authoritative
-    hostname: pdns_authoritative
+    image: powerhole:authoritative
+    container_name: powerhole_pdns_authoritative
+    hostname: powerhole_pdns_authoritative
     restart: always
     networks:
-      pdns_db_net:
-      pdns_web_net:
-      pdns_auth_net:
+      powerhole_pdns_auth_db:
+      powerhole_pdns_admin:
+      powerhole_pdns_authoritative:
         ipv4_address: "172.26.0.122"
     depends_on:
-      pdns_db:
+      powerhole_pdns_auth_db:
         condition: service_healthy
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges
 
-  pdns_admin_db:
+  powerhole_pdns_admin_db:
     image: postgres:13
-    container_name: pdns_admin_db
-    hostname: pdns_admin_db
+    container_name: powerhole_pdns_admin_db
+    hostname: powerhole_pdns_admin_db
     restart: always
     networks:
-      - pdns_admin_db_net
+      - powerhole_pdns_admin_db
     environment:
-      POSTGRES_DB: pdns_admin
-      POSTGRES_USER: pdns_admin
+      POSTGRES_DB: powerhole_admin
+      POSTGRES_USER: powerhole_admin
       POSTGRES_PASSWORD_FILE: /run/secrets/admin_db_password
     volumes:
       - db_admin:/var/lib/postgresql/data
@@ -74,15 +74,15 @@ services:
     security_opt:
       - no-new-privileges
 
-  pdns_admin:
+  powerhole_pdns_admin:
     image: ngoduykhanh/powerdns-admin:latest
-    container_name: pdns_admin
-    hostname: pdns_admin
+    container_name: powerhole_pdns_admin
+    hostname: powerhole_pdns_admin
     restart: always
     networks:
-      - pdns_admin_db_net
-      - pdns_web_net
-      - nginx_admin_net
+      - powerhole_pdns_admin_db
+      - powerhole_pdns_admin
+      - powerhole_nginx_admin
     environment:
       - SECRET_KEY_FILE=/run/secrets/pdns_admin_secret_key
       - SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri
@@ -92,9 +92,9 @@ services:
       - pdns_admin_secret_key
       - db_uri
     depends_on:
-      pdns_admin_db:
+      powerhole_pdns_admin_db:
         condition: service_healthy
-      pdns_authoritative:
+      powerhole_pdns_authoritative:
         condition: service_healthy
     cap_drop:
       - ALL
@@ -103,55 +103,55 @@ services:
     security_opt:
       - no-new-privileges
 
-  pdns_recursor:
+  powerhole_pdns_recursor:
     build: recursor
-    image: powerdns:recursor
-    container_name: pdns_recursor
-    hostname: pdns_recursor
+    image: powerhole:recursor
+    container_name: powerhole_pdns_recursor
+    hostname: powerhole_pdns_recursor
     restart: always
     networks:
-      pdns_rec_net:
+      powerhole_pdns_recursor:
         ipv4_address: "172.26.0.114"
     depends_on:
-      pdns_authoritative:
+      powerhole_pdns_authoritative:
         condition: service_healthy
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges
 
-  pdns_forwarder:
+  powerhole_pdns_forwarder:
     build: forwarder
-    image: powerdns:forwarder
-    container_name: pdns_forwarder
-    hostname: pdns_forwarder
+    image: powerhole:forwarder
+    container_name: powerhole_pdns_forwarder
+    hostname: powerhole_pdns_forwarder
     restart: always
     networks:
-      pdns_auth_net:
-      pdns_rec_net:
-      hole_net:
+      powerhole_pdns_authoritative:
+      powerhole_pdns_recursor:
+      powerhole_pdns_forwarder:
         ipv4_address: "172.26.0.130"
     depends_on:
-      pdns_authoritative:
+      powerhole_pdns_authoritative:
         condition: service_healthy
-      pdns_recursor:
+      powerhole_pdns_recursor:
         condition: service_healthy
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges
 
-  pihole:
+  powerhole_pihole:
     image: pihole/pihole
-    container_name: pihole
-    hostname: pihole
+    container_name: powerhole_pihole
+    hostname: powerhole_pihole
     restart: always
     ports:
       - "53:53/tcp"
       - "53:53/udp"
     networks:
-      - hole_net
-      - nginx_pihole_net
+      - powerhole_pdns_forwarder
+      - powerhole_nginx_pihole
     environment:
       - TZ=Europe/Amsterdam
       - PIHOLE_DNS_=172.26.0.130
@@ -160,7 +160,7 @@ services:
       - pihole:/etc/pihole/
       - dnsmasq:/etc/dnsmasq.d/
     depends_on:
-      pdns_forwarder:
+      powerhole_pdns_forwarder:
         condition: service_healthy
     cap_drop:
       - ALL
@@ -173,7 +173,7 @@ services:
       - SETUID
       - SETFCAP
 
-  nginx:
+  powerhole_nginx:
     build:
       context: nginx
       args:
@@ -181,13 +181,14 @@ services:
         PIHOLE_HOSTNAME: pihole.local.intra
     image: powerhole:nginx
     container_name: powerhole_nginx
+    hostname: powerhole_nginx
     restart: always
     ports:
       - "80:8080"
       - "443:44380"
     networks:
-      - nginx_admin_net
-      - nginx_pihole_net
+      - powerhole_nginx_admin
+      - powerhole_nginx_pihole
     secrets:
       - source: certificate
         target: /srv/certificates/fullchain.pem
@@ -196,9 +197,9 @@ services:
       - source: dh_params
         target: /srv/certificates/dhparams.pem
     depends_on:
-      pdns_admin:
+      powerhole_pdns_admin:
         condition: service_healthy
-      pihole:
+      powerhole_pihole:
         condition: service_healthy
     cap_drop:
       - ALL
@@ -206,7 +207,7 @@ services:
       - no-new-privileges
 
 volumes:
-  db:
+  db_auth:
   db_admin:
   pihole:
   dnsmasq:
@@ -236,78 +237,78 @@ secrets:
 
 networks:
 
-  pdns_db_net:
-    name: pdns_db_net
+  powerhole_pdns_auth_db:
+    name: powerhole_pdns_auth_db
     internal: true
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.88/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_db
+      com.docker.network.bridge.name: dbr-ph_auth_db
 
-  pdns_admin_db_net:
-    name: pdns_admin_db_net
+  powerhole_pdns_admin_db:
+    name: powerhole_pdns_admin_db
     internal: true
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.96/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_admin
+      com.docker.network.bridge.name: dbr-ph_admin_db
 
-  pdns_web_net:
-    name: pdns_web_net
+  powerhole_pdns_admin:
+    name: powerhole_pdns_admin
     internal: true
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.104/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_web
+      com.docker.network.bridge.name: dbr-ph_admin
 
-  pdns_rec_net:
-    name: pdns_rec_net
+  powerhole_pdns_recursor:
+    name: powerhole_pdns_recursor
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.112/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_rec
+      com.docker.network.bridge.name: dbr-ph_rec
 
-  pdns_auth_net:
-    name: pdns_auth_net
+  powerhole_pdns_authoritative:
+    name: powerhole_pdns_authoritative
     internal: true
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.120/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-pdns_auth
+      com.docker.network.bridge.name: dbr-ph_auth
 
-  hole_net:
-    name: hole_net
+  powerhole_pdns_forwarder:
+    name: powerhole_pdns_forwarder
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.128/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-hole
+      com.docker.network.bridge.name: dbr-ph_fwd
 
-  nginx_admin_net:
-    name: nginx_admin_net
+  powerhole_nginx_admin:
+    name: powerhole_nginx_admin
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.136/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-ng_admin
+      com.docker.network.bridge.name: dbr-ph_ng_admin
 
-  nginx_pihole_net:
-    name: nginx_pihole_net
+  powerhole_nginx_pihole:
+    name: powerhole_nginx_pihole
     ipam:
       driver: default
       config:
         - subnet: "172.26.0.144/29"
     driver_opts:
-      com.docker.network.bridge.name: dbr-ng_pihole
+      com.docker.network.bridge.name: dbr-ph_ng_hole
