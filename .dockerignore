@@ -1,0 +1,9 @@
+# IDE related
+.idea/
+
+# Git stuff
+.git/
+.gitignore
+
+# Secrets
+secrets/
