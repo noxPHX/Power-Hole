@@ -12,8 +12,9 @@ Finally [Pi-hole](https://github.com/pi-hole/pi-hole) is a [DNS sinkhole](https:
 The aim of this project is to supply an easy way to deploy and manage a stack of DNS services featuring:
 + 👮 Your own DNS zones, with the authoritative server
 + 🚀 Fast speeds, with local DNS caching
-+ 🔒 Secure network, blocking unwanted content
++ 🛡️ Secure network, blocking unwanted content
 + 🚫 Privacy, with your own recursive server
++ 🔒 Secure access, with HTTPS and authentication
 
 ## Table of contents 📋
 See below the top level parts of this README:
@@ -36,12 +37,12 @@ Only [Docker](https://docs.docker.com/get-docker/) and [Compose](https://docs.do
 
 ## The Stack 🐳
 
-The `docker-compose.yml` file defines **7** services:
-+ **pdns_authoritative**, the authoritative DNS server and its database **pdns_db**
-+ **pdns_admin**, the web interface and its database **pdns_admin_db**
-+ **pdns_recursor**, the recursive server
-+ **pdns_forwarder**, to forward the requests
-+ **pihole**, the DNS sinkhole
+The `docker-compose.yml` file defines **8** services:
++ **The authoritative DNS server** and its **database**
++ **The admin web interface** and its **database**
++ **The recursive server**, for domain resolution
++ **Pi-hole**, the DNS sinkhole and the **server to forward its requests**
++ **Nginx**, the reverse proxy, to handle SSL
 
 In a nutshell, to resolve a domain, **Pi-hole** receive the DNS request and decide whether to block it or not, if the domain is authorized the request is passed to the **forwarder**.  
 The **forwarder** will then pass the request to the **authoritative server**, if the latter does not manage the domain, the request is sent to the **recursive server** to be resolved.
@@ -67,10 +68,24 @@ Here is some inspiration to help you randomly create these secrets, feel free to
 cd secrets
 date +%s | sha256sum | base64 | head -c 32 > db_password.txt
 openssl rand -base64 32 > admin_db_password.txt
-echo "postgresql://pdns_admin:$(cat admin_db_password.txt)@pdns_admin_db/pdns_admin" > db_uri.txt
+echo "postgresql://powerhole_admin:$(cat admin_db_password.txt)@powerhole_pdns_admin_db/powerhole_admin" > db_uri.txt
 dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
+
+### SSL
+The stack comes with a nginx container which needs a certificate and its private key as well as Diffie-Hellman parameters.  
+
+If needed, you can quickly generate a self-signed certificate as shown below:
+```bash
+openssl req -x509 -newkey rsa:4096 -nodes -keyout ssl/privkey.pem -out ssl/fullchain.pem -days 365 -subj '/CN=localhost' -addext "subjectAltName=DNS:pdns.local.intra,DNS:pihole.local.intra,IP:127.0.0.1,IP:0.0.0.0"
+```
+
+Regarding the D-H parameters you can generate them as follows:
+```bash
+openssl dhparams -out ssl/dhparams.pem 4096
+```
+*Depending on your machine, you might have time to grab a coffee* ☕
 
 ### Run!
 
@@ -86,6 +101,8 @@ docker-compose up -d
 
 Finally, change the DNS server of your devices to the host on which you deployed the stack.  
 Depending on your ISP, you might even be able to change it on your router's settings directly.  
+
+You can access PowerDNS-Admin at `https://localhost` as it's the default server, from there you can create the entry to access Pi-hole.  
 
 ## Contributing 🤝
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
