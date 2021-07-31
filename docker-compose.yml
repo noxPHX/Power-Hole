@@ -165,14 +165,13 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - AUDIT_WRITE
       - CHOWN
       - DAC_OVERRIDE
       - FOWNER
       - SETGID
       - SETUID
       - SETFCAP
-    security_opt:
-      - no-new-privileges
 
   nginx:
     build:
