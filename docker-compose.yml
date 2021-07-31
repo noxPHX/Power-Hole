@@ -87,9 +87,7 @@ services:
       - SECRET_KEY_FILE=/run/secrets/pdns_admin_secret_key
       - SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri
       - GUNICORN_TIMEOUT=60
-      - GUNICORN_WORKERS=2
-      - GUNICORN_LOGLEVEL=DEBUG
-      - OFFLINE_MODE=False
+      - GUNICORN_WORKERS=1
     secrets:
       - pdns_admin_secret_key
       - db_uri
