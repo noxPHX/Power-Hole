@@ -158,6 +158,7 @@ services:
       - TZ=Europe/Amsterdam
       - PIHOLE_DNS_=172.26.0.130
       - DNSMASQ_LISTENING=all
+      - DNS_BOGUS_PRIV=false # Forward private reverse lookups
     volumes:
       - pihole:/etc/pihole/
       - dnsmasq:/etc/dnsmasq.d/
