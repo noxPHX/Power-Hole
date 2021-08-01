@@ -87,6 +87,17 @@ openssl dhparams -out ssl/dhparams.pem 4096
 ```
 *Depending on your machine, you might have time to grab a coffee* ☕
 
+### Configuration
+The only thing you might want to change are the domain names for the admin interface and Pi-hole.  
+You can change them in the `docker-compose.yml` file under the `powerhole_nginx` service as build arguments *(l. 184 - 185)*.  
+
+If you want to fine tune even more the different services, you can have a look at their respective documentation:
++ [PowerDNS Authoritative settings page](https://doc.powerdns.com/authoritative/settings.html)
++ [PowerDNS Recursor settings page](https://doc.powerdns.com/recursor/settings.html)
++ [PowerDNS-Admin GitHub](https://github.com/ngoduykhanh/PowerDNS-Admin)
++ [Pi-hole GitHub](https://github.com/pi-hole/docker-pi-hole)
++ [Postgres environment variables](https://github.com/docker-library/docs/tree/master/postgres#how-to-extend-this-image)
+
 ### Run!
 
 When you are ready, these commands will suffice to build the images and run the services.  
