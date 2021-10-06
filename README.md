@@ -83,7 +83,7 @@ openssl req -x509 -newkey rsa:4096 -nodes -keyout ssl/privkey.pem -out ssl/fullc
 
 Regarding the D-H parameters you can generate them as follows:
 ```bash
-openssl dhparams -out ssl/dhparams.pem 4096
+openssl dhparam -out ssl/dhparams.pem 4096
 ```
 *Depending on your machine, you might have time to grab a coffee* ☕
 
