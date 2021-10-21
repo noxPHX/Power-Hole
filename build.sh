@@ -24,7 +24,7 @@ docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api
 docker-compose build powerhole_pdns_recursor powerhole_pdns_forwarder powerhole_nginx
 
 cd /tmp || exit 1
-git clone https://github.com/ngoduykhanh/PowerDNS-Admin.git && cd PowerDNS-Admin || exit 1
+git clone --depth 1 https://github.com/ngoduykhanh/PowerDNS-Admin.git && cd PowerDNS-Admin || exit 1
 docker build --no-cache -t powerhole:admin -f docker/Dockerfile .
 cd "$this_script_path" || exit 1
 rm -r /tmp/PowerDNS-Admin

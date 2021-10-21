@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 RUN apt-get update && \
     apt-get -y install \
@@ -6,11 +6,7 @@ RUN apt-get update && \
     gnupg \
     dnsutils
 
-RUN echo "deb [arch=$(dpkg --print-architecture)] http://repo.powerdns.com/debian buster-auth-45 main" > /etc/apt/sources.list.d/pdns.list && \
-    curl -s https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add -
-
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install pdns-server pdns-backend-pgsql && \
+RUN apt-get -y --no-install-recommends install pdns-server pdns-backend-pgsql && \
     rm -rf /var/lib/apt/lists/*
 
 COPY pdns.conf /etc/powerdns/pdns.d/pdns.conf
