@@ -75,7 +75,7 @@ services:
       - no-new-privileges
 
   powerhole_pdns_admin:
-    image: ngoduykhanh/powerdns-admin:latest
+    image: powerhole:admin
     container_name: powerhole_pdns_admin
     hostname: powerhole_pdns_admin
     restart: always
