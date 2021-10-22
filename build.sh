@@ -17,12 +17,17 @@ fi
 
 cd "$this_script_path" || exit 1
 
+# Authoritative server's populating script
+wget -qO authoritative/init.sql https://raw.githubusercontent.com/PowerDNS/pdns/rel/auth-4.4.x/modules/gpgsqlbackend/schema.pgsql.sql
+
 # Compose does not allow yet BuildKit secrets
 export DOCKER_BUILDKIT=1
 docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api_key,src=secrets/api_key.txt -t powerhole:authoritative authoritative
 
+# Build the recursor, forwarder and nginx
 docker-compose build powerhole_pdns_recursor powerhole_pdns_forwarder powerhole_nginx
 
+# Locally build the PowerDNS-Admin image because the Docker Hub does not provide an image for ARM devices
 cd /tmp || exit 1
 git clone --depth 1 https://github.com/ngoduykhanh/PowerDNS-Admin.git && cd PowerDNS-Admin || exit 1
 docker build --no-cache -t powerhole:admin -f docker/Dockerfile .

@@ -7,3 +7,6 @@ secrets/*
 !secrets/ssl
 secrets/ssl/*
 !secrets/ssl/.gitkeep
+
+# Build related
+*.sql
