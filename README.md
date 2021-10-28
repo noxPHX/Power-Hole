@@ -15,7 +15,7 @@ The aim of this project is to supply an easy way to deploy and manage a stack of
 + 🛡️ Secure network, blocking unwanted content
 + 🚫 Privacy, with your own recursive server
 + 🔒 Secure access, with HTTPS and authentication
-+ 🪶 Lightweight, the stack can run on a Raspberry Pi
++ ☁️ Lightweight, the stack can run on a Raspberry Pi
 
 ## Table of contents 📋
 See below the top level parts of this README:
