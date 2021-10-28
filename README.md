@@ -15,6 +15,7 @@ The aim of this project is to supply an easy way to deploy and manage a stack of
 + 🛡️ Secure network, blocking unwanted content
 + 🚫 Privacy, with your own recursive server
 + 🔒 Secure access, with HTTPS and authentication
++ 🪶 Lightweight, the stack can run on a Raspberry Pi
 
 ## Table of contents 📋
 See below the top level parts of this README:
@@ -108,16 +109,24 @@ When you are ready, these commands will suffice to build the images and run the 
 ./build.sh
 docker-compose up -d
 ```
-*The `docker-compose build` command can not be used here because I need to use Docker's build time secrets which are currently not supported by Compose, hence a convenient script replace this command here.*
+The `docker-compose build` command can not be used here because I need to use Docker's build time secrets which are currently not supported by Compose.  
+Also, to support ARM devices (my personal setup runs on a Raspberry Pi 4) the [PowerDNS-Admin image](https://hub.docker.com/r/ngoduykhanh/powerdns-admin) must be built locally, which can by the way take quite some times.  
+For these reasons, a convenient script replace the build command here.
+
+### Usage
+You can access PowerDNS-Admin at `https://localhost` as it's the default server, from there you can create the DNS entry (*default is pihole.local.intra*) to access Pi-hole.
+
+The first time you access it, you will be asked for the `PDNS API URL`, here you can specify `http://powerhole_pdns_authoritative:8081`.  
+The `PDNS VERSION` parameter depends on the version installed by the package manager but a the time it is `4.4.1`.  
+The `PDNS API KEY` should be the same as the one generated earlier.  
 
 Finally, change the DNS server of your devices to the host and port on which you deployed the stack.  
 Depending on your ISP, you might even be able to change it on your router's settings directly.  
 
-You can access PowerDNS-Admin at `https://localhost` as it's the default server, from there you can create the DNS entry (*default is pihole.local.intra*) to access Pi-hole.  
-The first time you access it, you will be asked for the PDNS API URL, here you can specify `http://powerhole_pdns_authoritative:8081`.  
 
 ## Contributing 🤝
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+This repository is to fulfill my personal's needs and major changes from pull requests might not be welcome.  
+However, if you ever find an issue please feel free to report it and I will be glad to solve it.  
 
 ## Licence 📃
 [GPL-3.0](https://github.com/noxPHX/Power-Hole/blob/main/LICENSE)
