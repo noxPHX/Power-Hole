@@ -88,6 +88,12 @@ openssl dhparam -out ssl/dhparams.pem 4096
 ```
 *Depending on your machine, you might have time to grab a coffee* ☕
 
+Finally, apply correct ownership (*www-data has id 33*)
+```bash
+chown -R $USER:33 ssl/
+chmod 640 ssl/privkey.pem
+```
+
 ### Configuration
 The only thing you might want to change are the domain names for the admin interface and Pi-hole.  
 You can change them in the `docker-compose.yml` file under the `powerhole_nginx` service as build arguments *(l. 184 - 185)*.  
