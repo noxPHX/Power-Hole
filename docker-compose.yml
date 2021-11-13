@@ -30,7 +30,10 @@ services:
       - no-new-privileges
 
   powerhole_pdns_authoritative:
-    build: authoritative
+    build:
+      context: authoritative
+      args:
+        LOG_LEVEL: 6  # 3 - 6 (https://doc.powerdns.com/authoritative/settings.html#loglevel)
     image: powerhole:authoritative
     container_name: powerhole_pdns_authoritative
     hostname: powerhole_pdns_authoritative
@@ -104,7 +107,10 @@ services:
       - no-new-privileges
 
   powerhole_pdns_recursor:
-    build: recursor
+    build:
+      context: recursor
+      args:
+        LOG_LEVEL: 9  # 0 - 9 (https://doc.powerdns.com/recursor/settings.html#loglevel)
     image: powerhole:recursor
     container_name: powerhole_pdns_recursor
     hostname: powerhole_pdns_recursor

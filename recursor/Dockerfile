@@ -11,7 +11,10 @@ RUN apt-get -y --no-install-recommends install pdns-recursor && \
 
 COPY --chown=pdns:pdns recursor.conf /etc/powerdns/recursor.d/recursor.conf
 
+ARG LOG_LEVEL
+
 RUN mkdir /var/run/pdns && \
+    sed -i "s/log_level/${LOG_LEVEL}/g" /etc/powerdns/recursor.d/recursor.conf && \
     chown -R pdns:pdns /var/run/pdns
 
 USER pdns
