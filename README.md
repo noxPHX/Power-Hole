@@ -123,7 +123,7 @@ For these reasons, a convenient script replace the build command here.
 You can access PowerDNS-Admin at `https://localhost` as it's the default server, from there you can create the DNS entry (*default is pihole.local.intra*) to access Pi-hole.
 
 The first time you access it, you will be asked for the `PDNS API URL`, here you can specify `http://powerhole_pdns_authoritative:8081`.  
-The `PDNS VERSION` parameter depends on the version installed by the package manager but a the time it is `4.4.1`.  
+The `PDNS VERSION` parameter depends on the version installed by the package manager but at the time it is `4.4.2`.  
 The `PDNS API KEY` should be the same as the one generated earlier.  
 
 Finally, change the DNS server of your devices to the host and port on which you deployed the stack.  
