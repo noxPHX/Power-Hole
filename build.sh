@@ -30,16 +30,16 @@ docker-compose build powerhole_pdns_recursor powerhole_pdns_forwarder powerhole_
 # Locally build the PowerDNS-Admin image because the Docker Hub does not provide an image for ARM devices
 cd /tmp || exit 1
 git clone https://github.com/PowerDNS-Admin/PowerDNS-Admin.git && cd PowerDNS-Admin || exit 1
-git checkout v0.4.0
+git checkout v0.4.1
 docker build --no-cache -t powerhole:admin -f docker/Dockerfile .
 cd "$this_script_path" || exit 1
 rm -r /tmp/PowerDNS-Admin
 
 #diff --git a/docker/Dockerfile b/docker/Dockerfile
-#index b553998..6efb3c8 100644
+#index 55ccdfd..3d028fb 100644
 #--- a/docker/Dockerfile
 #+++ b/docker/Dockerfile
-#@@ -7,6 +7,7 @@ ARG BUILD_DEPENDENCIES="build-base \
+#@@ -8,6 +8,7 @@ ARG BUILD_DEPENDENCIES="build-base \
 #     openldap-dev \
 #     python3-dev \
 #     xmlsec-dev \
@@ -47,7 +47,7 @@ rm -r /tmp/PowerDNS-Admin
 #     npm \
 #     yarn \
 #     cargo"
-#@@ -14,7 +15,8 @@ ARG BUILD_DEPENDENCIES="build-base \
+#@@ -15,7 +16,8 @@ ARG BUILD_DEPENDENCIES="build-base \
 # ENV LC_ALL=en_US.UTF-8 \
 #     LANG=en_US.UTF-8 \
 #     LANGUAGE=en_US.UTF-8 \
@@ -57,7 +57,7 @@ rm -r /tmp/PowerDNS-Admin
 # 
 # # Get dependencies
 # # py3-pip should not belong to BUILD_DEPENDENCIES. Otherwise, when we remove
-#@@ -36,7 +38,7 @@ RUN pip install --upgrade pip && \
+#@@ -37,7 +39,7 @@ RUN pip install --upgrade pip && \
 # COPY . /build
 # 
 # # Prepare assets
@@ -66,7 +66,7 @@ rm -r /tmp/PowerDNS-Admin
 #     yarn cache clean && \
 #     sed -i -r -e "s|'rcssmin',\s?'cssrewrite'|'rcssmin'|g" /build/powerdnsadmin/assets.py && \
 #     flask assets build
-#@@ -72,7 +74,7 @@ FROM alpine:3.17
+#@@ -73,7 +75,7 @@ FROM alpine:3.17
 # ENV FLASK_APP=/app/powerdnsadmin/__init__.py \
 #     USER=pda
 # 
@@ -76,7 +76,7 @@ rm -r /tmp/PowerDNS-Admin
 #     adduser -S -D -G ${USER} ${USER} && \
 #     mkdir /data && \
 #diff --git a/requirements.txt b/requirements.txt
-#index 9753bf0..f7b01e9 100644
+#index 0db7b16..ffd2d98 100644
 #--- a/requirements.txt
 #+++ b/requirements.txt
 #@@ -9,7 +9,7 @@ Flask-SeaSurf==1.1.1
@@ -88,3 +88,10 @@ rm -r /tmp/PowerDNS-Admin
 # SQLAlchemy==1.3.24
 # #alembic==1.9.0
 # bcrypt==4.0.1
+#@@ -45,4 +45,4 @@ zipp==3.11.0
+# rcssmin==1.1.1
+# zxcvbn==4.4.28
+# psycopg2==2.9.5
+#-setuptools==65.5.1 # fixes CVE-2022-40897
+#\ No newline at end of file
+#+setuptools==65.5.1 # fixes CVE-2022-40897
