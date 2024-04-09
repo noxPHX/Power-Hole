@@ -74,6 +74,8 @@ dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
 
+⚠️ No new line must be present in the **db_uri.txt** file, consider truncating it: `truncate -s -1 db_uri.txt` ⚠️  
+
 ### SSL
 The stack comes with a nginx container which needs a certificate and its private key as well as Diffie-Hellman parameters.  
 
