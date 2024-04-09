@@ -2,7 +2,8 @@
 
 Power-Hole is a simple Docker Compose stack featuring [PowerDNS](https://github.com/PowerDNS/pdns), [PowerDNS-Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) and [Pi-hole](https://github.com/pi-hole/pi-hole) for a quick & easy DNS setup.  
 
-*This project is intended to meet my personal requirements and thus fulfill a very specific need (see more below).*  
+> [!NOTE]
+> This project is intended to meet my personal requirements and thus fulfill a very specific need (see more below).  
 
 ## Introduction 🖋️
 [PowerDNS](https://github.com/PowerDNS/pdns) is a suite of various pieces of software which provide an authoritative and a recursive DNS server as well as a load balancer.  
@@ -34,7 +35,8 @@ Only [Docker](https://docs.docker.com/get-docker/) and [Compose](https://docs.do
 | Docker        | 20      |
 | Compose       | 1.29    |
 
-*I will not detail how to set up this project without Docker, but understanding the stack below you might be able to install and configure each component separately.*
+> [!NOTE]
+> I will not detail how to set up this project without Docker, but understanding the stack below you might be able to install and configure each component separately.
 
 ## The Stack 🐳
 
@@ -62,7 +64,8 @@ To properly work, Power-Hole needs to have some secrets defined:
 + **api_key.txt**, the PowerDNS authoritative server REST API key
 + **pdns_admin_secret_key.txt**, the PowerDNS-Admin internal secret key
 
-⚠️ Be sure to set the same string for the **admin_db_password.txt** and within the **db_uri.txt** ⚠️  
+> [!WARNING]
+>Be sure to set the same string for the **admin_db_password.txt** and within the **db_uri.txt**  
 
 Here is some inspiration to help you randomly create these secrets, feel free to set them as you please.
 ```bash
@@ -74,7 +77,8 @@ dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
 
-⚠️ No new line must be present in the **db_uri.txt** file, consider truncating it: `truncate -s -1 db_uri.txt` ⚠️  
+> [!WARNING]
+> No new line must be present in the **db_uri.txt** file, consider truncating it: `truncate -s -1 db_uri.txt`  
 
 ### SSL
 The stack comes with a nginx container which needs a certificate and its private key as well as Diffie-Hellman parameters.  
@@ -111,7 +115,8 @@ If you want to fine tune even more the different services, you can have a look a
 
 When you are ready, these commands will suffice to build the images and run the services.  
 
-⚠️ **You must ensure that no other service is running on port 53 (eg systemd-resolved) otherwise you can change the port to bind.** ⚠️
+> [!IMPORTANT]
+> You must ensure that no other service is running on port 53 (eg systemd-resolved) otherwise you can change the port to bind.  
 
 ```bash
 ./build.sh
