@@ -102,7 +102,7 @@ chmod 640 ssl/privkey.pem
 
 ### Configuration
 The only thing you might want to change are the domain names for the admin interface and Pi-hole.  
-You can change them in the `docker-compose.yml` file under the `powerhole_nginx` service as build arguments *(l. 184 - 185)*.  
+You can change them in the `*.conf` files under the `nginx` folder.  
 
 If you want to fine tune even more the different services, you can have a look at their respective documentation:
 + [PowerDNS Authoritative settings page](https://doc.powerdns.com/authoritative/settings.html)

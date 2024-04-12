@@ -184,12 +184,7 @@ services:
       - SETFCAP
 
   powerhole_nginx:
-    build:
-      context: nginx
-      args:
-        ADMIN_HOSTNAME: pdns.local.intra
-        PIHOLE_HOSTNAME: pihole.local.intra
-    image: powerhole:nginx
+    image: nginxinc/nginx-unprivileged:1.25.4
     container_name: powerhole_nginx
     hostname: powerhole_nginx
     restart: always
@@ -199,13 +194,23 @@ services:
     networks:
       - powerhole_nginx_admin
       - powerhole_nginx_pihole
+    volumes:
+      - type: bind
+        source: ./nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+      - type: bind
+        source: ./nginx/admin.conf
+        target: /etc/nginx/conf.d/default.conf
+      - type: bind
+        source: ./nginx/pihole.conf
+        target: /etc/nginx/conf.d/pihole.conf
     secrets:
       - source: certificate
-        target: /srv/certificates/fullchain.pem
+        target: /srv/ssl/fullchain.pem
       - source: private_key
-        target: /srv/certificates/privkey.pem
+        target: /srv/ssl/privkey.pem
       - source: dh_params
-        target: /srv/certificates/dhparams.pem
+        target: /srv/ssl/dhparams.pem
     depends_on:
       powerhole_pdns_admin:
         condition: service_healthy
