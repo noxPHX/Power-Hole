@@ -7,6 +7,7 @@ services:
     container_name: powerhole_pdns_auth_db
     hostname: powerhole_pdns_auth_db
     restart: always
+    mem_limit: "50M"
     networks:
       - powerhole_pdns_auth_db
     environment:
@@ -38,6 +39,7 @@ services:
     container_name: powerhole_pdns_authoritative
     hostname: powerhole_pdns_authoritative
     restart: always
+    mem_limit: "100M"
     networks:
       powerhole_pdns_auth_db:
       powerhole_pdns_admin:
@@ -56,6 +58,7 @@ services:
     container_name: powerhole_pdns_admin_db
     hostname: powerhole_pdns_admin_db
     restart: always
+    mem_limit: "50M"
     networks:
       - powerhole_pdns_admin_db
     environment:
@@ -82,6 +85,7 @@ services:
     container_name: powerhole_pdns_admin
     hostname: powerhole_pdns_admin
     restart: always
+    mem_limit: "200M"
     networks:
       - powerhole_pdns_admin_db
       - powerhole_pdns_admin
@@ -115,6 +119,7 @@ services:
     container_name: powerhole_pdns_recursor
     hostname: powerhole_pdns_recursor
     restart: always
+    mem_limit: "50M"
     init: true
     networks:
       powerhole_pdns_recursor:
@@ -133,6 +138,7 @@ services:
     container_name: powerhole_pdns_forwarder
     hostname: powerhole_pdns_forwarder
     restart: always
+    mem_limit: "50M"
     init: true
     networks:
       powerhole_pdns_authoritative:
@@ -154,6 +160,7 @@ services:
     container_name: powerhole_pihole
     hostname: powerhole_pihole
     restart: always
+    mem_limit: "50M"
     ports:
       - "53:53/tcp"
       - "53:53/udp"
@@ -188,6 +195,7 @@ services:
     container_name: powerhole_nginx
     hostname: powerhole_nginx
     restart: always
+    mem_limit: "50M"
     ports:
       - "80:8080"
       - "443:44380"
