@@ -7,7 +7,7 @@ services:
     container_name: powerhole_pdns_auth_db
     hostname: powerhole_pdns_auth_db
     restart: always
-    mem_limit: "50M"
+    mem_limit: "100M"
     networks:
       - powerhole_pdns_auth_db
     environment:
@@ -58,7 +58,7 @@ services:
     container_name: powerhole_pdns_admin_db
     hostname: powerhole_pdns_admin_db
     restart: always
-    mem_limit: "50M"
+    mem_limit: "100M"
     networks:
       - powerhole_pdns_admin_db
     environment:
