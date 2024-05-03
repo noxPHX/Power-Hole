@@ -32,8 +32,8 @@ Only [Docker](https://docs.docker.com/get-docker/) and [Compose](https://docs.do
 
 | Tool          | Version |
 |:-------------:|:-------:|
-| Docker        | 20      |
-| Compose       | 1.29    |
+| Docker        | 23      |
+| Compose       | 2+      |
 
 > [!NOTE]
 > I will not detail how to set up this project without Docker, but understanding the stack below you might be able to install and configure each component separately.
@@ -72,7 +72,7 @@ Here is some inspiration to help you randomly create these secrets, feel free to
 cd secrets
 date +%s | sha256sum | base64 | head -c 32 > db_password.txt
 openssl rand -base64 32 > admin_db_password.txt
-echo "postgresql://powerhole_admin:$(cat admin_db_password.txt)@powerhole_pdns_admin_db/powerhole_admin" > db_uri.txt
+echo "postgresql://powerhole_admin:$(cat admin_db_password.txt)@powerhole-pdns-admin-db/powerhole_admin" > db_uri.txt
 dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | tr -d / > api_key.txt
 cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 > pdns_admin_secret_key.txt
 ```
@@ -120,16 +120,16 @@ When you are ready, these commands will suffice to build the images and run the 
 
 ```bash
 ./build.sh
-docker-compose up -d
+docker compose up -d
 ```
-The `docker-compose build` command can not be used here because I need to use Docker's build time secrets which are currently not supported by Compose.  
+The `docker compose build` command can not be used here because I need to use Docker's build time secrets which are currently not supported by Compose.  
 Also, to support ARM devices (my personal setup runs on a Raspberry Pi 4) the [PowerDNS-Admin image](https://hub.docker.com/r/ngoduykhanh/powerdns-admin) must be built locally, which can by the way take quite some times.  
 For these reasons, a convenient script replace the build command here.
 
 ### Usage
 You can access PowerDNS-Admin at `https://localhost` as it's the default server, from there you can create the DNS entry (*default is pihole.local.intra*) to access Pi-hole.
 
-The first time you access it, you will be asked for the `PDNS API URL`, here you can specify `http://powerhole_pdns_authoritative:8081`.  
+The first time you access it, you will be asked for the `PDNS API URL`, here you can specify `http://powerhole-pdns-authoritative:8081`.  
 The `PDNS VERSION` parameter depends on the version installed by the package manager but at the time it is `4.4.2`.  
 The `PDNS API KEY` should be the same as the one generated earlier.  
 
