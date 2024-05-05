@@ -140,7 +140,9 @@ services:
     init: true
     networks:
       powerhole-pdns-authoritative:
+        ipv4_address: "172.26.0.123"
       powerhole-pdns-recursor:
+        ipv4_address: "172.26.0.115"
       powerhole-pdns-forwarder:
         ipv4_address: "172.26.0.130"
     depends_on:
@@ -163,8 +165,9 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
     networks:
-      - powerhole-pdns-forwarder
-      - powerhole-nginx-pihole
+      powerhole-pdns-forwarder:
+        ipv4_address: "172.26.0.131"
+      powerhole-nginx-pihole:
     environment:
       - TZ=Europe/Amsterdam
       - PIHOLE_DNS_=172.26.0.130
