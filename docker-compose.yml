@@ -31,8 +31,8 @@ services:
   powerhole-pdns-authoritative:
     build:
       context: authoritative
-      args:
-        LOG_LEVEL: 6  # 3 - 6 (https://doc.powerdns.com/authoritative/settings.html#loglevel)
+#      args:
+#        LOG_LEVEL: 6  # 3 - 6 (https://doc.powerdns.com/authoritative/settings.html#loglevel)
     image: powerhole:authoritative
     container_name: powerhole-pdns-authoritative
     hostname: powerhole-pdns-authoritative

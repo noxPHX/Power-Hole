@@ -11,11 +11,10 @@ RUN apt-get -y --no-install-recommends install pdns-server pdns-backend-pgsql &&
 
 COPY pdns.conf /etc/powerdns/pdns.d/pdns.conf
 
-ARG LOG_LEVEL
+#ARG LOG_LEVEL
 
 RUN --mount=type=secret,id=db_password --mount=type=secret,id=api_key sed -i "s/secret_pdns_password/$(cat /run/secrets/db_password)/g" /etc/powerdns/pdns.d/pdns.conf && \
     sed -i "s/secret_api_key/$(cat /run/secrets/api_key)/g" /etc/powerdns/pdns.d/pdns.conf && \
-    sed -i "s/log_level/${LOG_LEVEL}/g" /etc/powerdns/pdns.d/pdns.conf && \
     mkdir /var/run/pdns && \
     chown -R pdns:pdns /var/run/pdns /etc/powerdns/
 
