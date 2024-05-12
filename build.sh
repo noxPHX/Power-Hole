@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -e # Stop the script on errors
+set -u # Unset variables are an error
+set -o pipefail # Piping a failed process into a successful one is an error
+
 # Check the script is run as by a user with docker's rights
 if [ "$EUID" -ne 0 ]; then
   if ! id -nGz "$USER" | grep -qzxF docker; then
@@ -21,7 +25,6 @@ cd "$this_script_path" || exit 1
 wget -qO authoritative/init.sql https://raw.githubusercontent.com/PowerDNS/pdns/rel/auth-4.4.x/modules/gpgsqlbackend/schema.pgsql.sql
 
 # Compose does not allow yet BuildKit secrets
-export DOCKER_BUILDKIT=1
 docker build --secret id=db_password,src=secrets/db_password.txt --secret id=api_key,src=secrets/api_key.txt -t powerhole:authoritative authoritative
 
 # Build the recursor, forwarder and nginx
