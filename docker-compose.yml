@@ -225,6 +225,11 @@ services:
         condition: service_healthy
       powerhole-pihole:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sfk https://localhost:44380/health/ || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     cap_drop:
       - ALL
     security_opt:
