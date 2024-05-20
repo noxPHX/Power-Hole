@@ -156,7 +156,7 @@ services:
       - no-new-privileges
 
   powerhole-pihole:
-    image: pihole/pihole:2024.03.2
+    image: pihole/pihole:2024.05.0
     container_name: powerhole-pihole
     hostname: powerhole-pihole
     restart: always
