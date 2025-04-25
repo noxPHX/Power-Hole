@@ -160,7 +160,7 @@ services:
     container_name: powerhole-pihole
     hostname: powerhole-pihole
     restart: always
-    mem_limit: "50M"
+    mem_limit: "100M"
     ports:
       - "53:53/tcp"
       - "53:53/udp"
@@ -176,7 +176,6 @@ services:
       - FTLCONF_misc_etc_dnsmasq_d=true
     volumes:
       - pihole:/etc/pihole/
-      - dnsmasq:/etc/dnsmasq.d/
     depends_on:
       powerhole-pdns-forwarder:
         condition: service_healthy
@@ -191,6 +190,8 @@ services:
       - SETGID
       - SETUID
       - SETFCAP
+      - CAP_SYS_NICE
+      - CAP_SYS_TIME
 
   powerhole-nginx:
     image: nginxinc/nginx-unprivileged:1.27.3
@@ -240,7 +241,6 @@ volumes:
   db_auth:
   db_admin:
   pihole:
-  dnsmasq:
 
 secrets:
 
