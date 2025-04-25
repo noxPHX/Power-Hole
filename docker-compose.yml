@@ -156,7 +156,7 @@ services:
       - no-new-privileges
 
   powerhole-pihole:
-    image: pihole/pihole:2024.07.0
+    image: pihole/pihole:2025.02.7
     container_name: powerhole-pihole
     hostname: powerhole-pihole
     restart: always
@@ -170,9 +170,10 @@ services:
       powerhole-nginx-pihole:
     environment:
       - TZ=Europe/Amsterdam
-      - PIHOLE_DNS_=172.26.0.130
-      - DNSMASQ_LISTENING=all
-      - DNS_BOGUS_PRIV=false # Forward private reverse lookups
+      - FTLCONF_dns_upstreams=172.26.0.130
+      - FTLCONF_dns_listeningMode=all
+      - FTLCONF_dns_bogusPriv=false # Forward private reverse lookups
+      - FTLCONF_misc_etc_dnsmasq_d=true
     volumes:
       - pihole:/etc/pihole/
       - dnsmasq:/etc/dnsmasq.d/
