@@ -193,7 +193,7 @@ services:
       - CAP_SYS_TIME
 
   powerhole-nginx:
-    image: nginxinc/nginx-unprivileged:1.27.3
+    image: nginxinc/nginx-unprivileged:1.29.1
     container_name: powerhole-nginx
     hostname: powerhole-nginx
     restart: always
