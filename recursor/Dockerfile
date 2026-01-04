@@ -21,4 +21,4 @@ USER pdns
 
 ENTRYPOINT [ "pdns_recursor" ]
 
-HEALTHCHECK CMD dig +short +norecurse +retry=0 @127.0.0.1 || exit 1
+HEALTHCHECK --start-period=10s --start-interval=2s CMD dig +short +norecurse +retry=0 @127.0.0.1 || exit 1

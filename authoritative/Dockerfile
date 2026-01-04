@@ -22,4 +22,4 @@ USER pdns
 
 ENTRYPOINT [ "pdns_server" ]
 
-HEALTHCHECK CMD dig +short +norecurse +retry=0 @127.0.0.1 && curl -s --fail http://127.0.0.1:8081 || exit 1
+HEALTHCHECK --start-period=10s --start-interval=2s CMD dig +short +norecurse +retry=0 @127.0.0.1 && curl -s --fail http://127.0.0.1:8081 || exit 1
