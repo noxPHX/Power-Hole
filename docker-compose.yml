@@ -63,8 +63,8 @@ services:
     hostname: powerhole-pdns-admin-db
     restart: always
     cpus: "0.5"
-    mem_reservation: "32M"
-    mem_limit: "64M"
+    mem_reservation: "64M"
+    mem_limit: "128M"
     networks:
       - powerhole-pdns-admin-db
     environment:
