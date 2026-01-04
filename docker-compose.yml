@@ -5,6 +5,7 @@ services:
     container_name: powerhole-pdns-auth-db
     hostname: powerhole-pdns-auth-db
     restart: always
+    cpus: "0.5"
     mem_reservation: "32M"
     mem_limit: "64M"
     networks:
@@ -40,6 +41,7 @@ services:
     container_name: powerhole-pdns-authoritative
     hostname: powerhole-pdns-authoritative
     restart: always
+    cpus: "0.5"
     mem_reservation: "64M"
     mem_limit: "128M"
     networks:
@@ -60,6 +62,7 @@ services:
     container_name: powerhole-pdns-admin-db
     hostname: powerhole-pdns-admin-db
     restart: always
+    cpus: "0.5"
     mem_reservation: "32M"
     mem_limit: "64M"
     networks:
@@ -90,6 +93,7 @@ services:
     container_name: powerhole-pdns-admin
     hostname: powerhole-pdns-admin
     restart: always
+    cpus: "0.5"
     mem_reservation: "128M"
     mem_limit: "256M"
     networks:
@@ -125,6 +129,7 @@ services:
     container_name: powerhole-pdns-recursor
     hostname: powerhole-pdns-recursor
     restart: always
+    cpus: "0.5"
     mem_reservation: "16M"
     mem_limit: "32M"
     init: true
@@ -145,6 +150,7 @@ services:
     container_name: powerhole-pdns-forwarder
     hostname: powerhole-pdns-forwarder
     restart: always
+    cpus: "0.5"
     mem_reservation: "8M"
     mem_limit: "16M"
     init: true
@@ -170,6 +176,7 @@ services:
     container_name: powerhole-pihole
     hostname: powerhole-pihole
     restart: always
+    cpus: "0.5"
     mem_reservation: "64M"
     mem_limit: "128M"
     ports:
@@ -208,6 +215,7 @@ services:
     container_name: powerhole-nginx
     hostname: powerhole-nginx
     restart: always
+    cpus: "0.5"
     mem_reservation: "32M"
     mem_limit: "64M"
     ports:
