@@ -34,7 +34,8 @@ services:
 
   powerhole-pdns-authoritative:
     build:
-      context: authoritative
+      context: pdns
+      target: authoritative
 #      args:
 #        LOG_LEVEL: 6  # 3 - 6 (https://doc.powerdns.com/authoritative/settings.html#loglevel)
     image: powerhole:authoritative
@@ -122,7 +123,8 @@ services:
 
   powerhole-pdns-recursor:
     build:
-      context: recursor
+      context: pdns
+      target: recursor
       args:
         LOG_LEVEL: 9  # 0 - 9 (https://doc.powerdns.com/recursor/settings.html#loglevel)
     image: powerhole:recursor
@@ -145,7 +147,9 @@ services:
       - no-new-privileges
 
   powerhole-pdns-forwarder:
-    build: forwarder
+    build:
+      context: pdns
+      target: forwarder
     image: powerhole:forwarder
     container_name: powerhole-pdns-forwarder
     hostname: powerhole-pdns-forwarder
